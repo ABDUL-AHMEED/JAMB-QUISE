@@ -16,7 +16,260 @@ const mathQuestions = [
   {
     question: "Which number is not a binary number?",
     options: ["10101", "1110", "0011","10012",],
-    correctAnswer: "10012"
+    correctAnswer: "Lenz's law"
+  },
+
+  // Chapter 13: Optics (5)
+  {
+    question: "According to the law of reflection, the angle of incidence equals the:",
+    options: ["Angle of reflection", "Angle of refraction", "Normal", "Critical angle"],
+    correctAnswer: "Angle of reflection"
+  },
+  {
+    question: "An image formed by a plane mirror is generally:",
+    options: ["Virtual, upright and same size as the object", "Real and inverted", "Virtual and magnified", "Real and diminished"],
+    correctAnswer: "Virtual, upright and same size as the object"
+  },
+  {
+    question: "Light travels slower in glass than in air, so glass has refractive index:",
+    options: ["Greater than 1", "Equal to 0", "Less than 1", "Negative"],
+    correctAnswer: "Greater than 1"
+  },
+  {
+    question: "Total internal reflection occurs when light goes from a denser to a rarer medium and the angle is:",
+    options: ["Greater than the critical angle", "Less than the critical angle", "At right angle only", "Equal to zero"],
+    correctAnswer: "Greater than the critical angle"
+  },
+  {
+    question: "The unit of optical power of a lens is called the:",
+    options: ["Dioptre", "Meter", "Ohm", "Tesla"],
+    correctAnswer: "Dioptre"
+  },
+
+  // Chapter 14: Modern Physics (Photoelectric & Particles) (5)
+  {
+    question: "In the photoelectric effect, increasing the intensity of light (at same frequency) mainly increases the:",
+    options: ["Photoelectric current", "Kinetic energy of emitted electrons", "Frequency of light", "Work function of metal"],
+    correctAnswer: "Photoelectric current"
+  },
+  {
+    question: "If the frequency of incident light is below the threshold frequency, photoelectrons will be:",
+    options: ["Not emitted", "Emitted with low energy", "Emitted with high energy", "Emitted with increasing current"],
+    correctAnswer: "Not emitted"
+  },
+  {
+    question: "What is the magnitude of the elementary electric charge (approx.)?",
+    options: ["1.6×10⁻¹⁹ C", "9.1×10⁻³¹ C", "1.0×10⁻¹⁹ C", "1.6×10⁻¹⁸ C"],
+    correctAnswer: "1.6×10⁻¹⁹ C"
+  },
+  {
+    question: "Which of these is the mass of electron (approx.)?",
+    options: ["9.11×10⁻³¹ kg", "1.67×10⁻²⁷ kg", "1.00×10⁻²⁶ kg", "9.11×10⁻²⁸ kg"],
+    correctAnswer: "9.11×10⁻³¹ kg"
+  },
+  {
+    question: "An alpha particle consists of:",
+    options: ["Two protons and two neutrons", "One electron", "One proton", "One neutron"],
+    correctAnswer: "Two protons and two neutrons"
+  },
+
+  // Chapter 15: Nuclear Physics & Radioactivity (5)
+  {
+    question: "A sample decays from 80 g to 10 g in some time. How many half-lives have passed?",
+    options: ["3", "2", "4", "1"],
+    correctAnswer: "3"
+  },
+  {
+    question: "What is the SI unit of radioactivity (decays per second)?",
+    options: ["Becquerel", "Curie", "Gray", "Sievert"],
+    correctAnswer: "Becquerel"
+  },
+  {
+    question: "If a substance has half-life 2 days and initial mass 100 g, how much remains after 6 days?",
+    options: ["12.5 g", "25 g", "6.25 g", "50 g"],
+    correctAnswer: "12.5 g"
+  },
+  {
+    question: "Which type of radiation is least penetrating and stopped by paper?",
+    options: ["Alpha", "Beta", "Gamma", "Neutron"],
+    correctAnswer: "Alpha"
+  },
+  {
+    question: "A beta particle is identical to which particle?",
+    options: ["Electron", "Proton", "Neutron", "Alpha particle"],
+    correctAnswer: "Electron"
+  }
+];
+
+// CHEMISTRY QUESTIONS
+const chemistryQuestions = [
+  { question: "What is the chemical symbol for water?", options: ["O2", "CO2", "H2O", "NaCl"], correctAnswer: "H2O" },
+  { question: "Which gas turns limewater milky?", options: ["CO2", "O2", "N2", "H2"], correctAnswer: "CO2" },
+  // Add more chemistry questions here...
+];
+
+// ENGLISH QUESTIONS
+const englishQuestions = [
+  { question: "Choose the correct spelling.", options: ["Acommodate", "Accommodate", "Acomodate", "Accomodate"], correctAnswer: "Accommodate" },
+  { question: "What is the synonym of 'happy'?", options: ["Sad", "Joyful", "Angry", "Tired"], correctAnswer: "Joyful" },
+  // Add more english questions here...
+];
+
+// ================= DETECT SUBJECT PAGE =================
+let quizData = [];
+const path = window.location.pathname.toLowerCase();
+
+if (path.includes("math.html")) quizData = mathQuestions;
+else if (path.includes("physics.html")) quizData = physicsQuestions;
+else if (path.includes("chemistry.html")) quizData = chemistryQuestions;
+else if (path.includes("english.html")) quizData = englishQuestions;
+
+// If no specific subject detected, default to physics for testing
+if (quizData.length === 0) {
+  quizData = physicsQuestions;
+}
+
+// ================= QUIZ VARIABLES =================
+let currentQuestion = 0;
+let score = 0;
+let selectedAnswers = Array(quizData.length).fill(null);
+let timer;
+let timeLeft = 120; // 2 minutes in seconds
+
+// ================= FORMAT TIME =================
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// ================= UPDATE QUESTION NUMBER =================
+function updateQuestionNumber() {
+  document.getElementById("question-number").innerText = `Question ${currentQuestion + 1}`;
+}
+
+// ================= SHOW QUESTION =================
+function showQuestion() {
+  const q = quizData[currentQuestion];
+  document.getElementById("question").innerText = q.question;
+  
+  // Update question number
+  updateQuestionNumber();
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  q.options.forEach(option => {
+    const btn = document.createElement("button");
+    btn.innerText = option;
+    btn.onclick = () => {
+      selectedAnswers[currentQuestion] = option;
+      highlightSelection(option);
+    };
+    if (selectedAnswers[currentQuestion] === option) {
+      btn.style.backgroundColor = "#4CAF50";
+      btn.style.color = "white";
+    }
+    optionsDiv.appendChild(btn);
+  });
+
+  // Update navigation buttons
+  document.getElementById("back-btn").style.display = currentQuestion > 0 ? "inline-block" : "none";
+  document.getElementById("next-btn").style.display = currentQuestion < quizData.length - 1 ? "inline-block" : "none";
+  document.getElementById("submit-btn").style.display = currentQuestion === quizData.length - 1 ? "inline-block" : "none";
+}
+
+// ================= HIGHLIGHT SELECTION =================
+function highlightSelection(selected) {
+  document.querySelectorAll("#options button").forEach(btn => {
+    if (btn.innerText === selected) {
+      btn.style.backgroundColor = "#4CAF50";
+      btn.style.color = "white";
+    } else {
+      btn.style.backgroundColor = "";
+      btn.style.color = "";
+    }
+  });
+}
+
+// ================= NAVIGATION =================
+function nextQuestion() {
+  if (currentQuestion < quizData.length - 1) {
+    currentQuestion++;
+    showQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    showQuestion();
+  }
+}
+
+// ================= SUBMIT QUIZ =================
+function submitQuiz() {
+  clearInterval(timer);
+  score = 0;
+  quizData.forEach((q, i) => {
+    if (selectedAnswers[i] === q.correctAnswer) {
+      score++;
+    }
+  });
+  
+  const percentage = Math.round((score / quizData.length) * 100);
+  const grade = percentage >= 70 ? "Pass" : "Fail";
+  
+  document.getElementById("quiz-container").innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <h2>Quiz Completed!</h2>
+      <p style="font-size: 24px; margin: 20px 0;">Your Score: ${score}/${quizData.length}</p>
+      <p style="font-size: 20px; margin: 20px 0;">Percentage: ${percentage}%</p>
+      <p style="font-size: 18px; margin: 20px 0; color: ${grade === 'Pass' ? 'green' : 'red'};">Grade: ${grade}</p>
+      <button onclick="location.reload()" style="padding: 10px 20px; font-size: 16px; margin-top: 20px;">Restart Quiz</button>
+    </div>
+  `;
+}
+
+// ================= TIMER =================
+function startTimer() {
+  document.getElementById("timer").innerText = `Time left: ${formatTime(timeLeft)}`;
+  
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = `Time left: ${formatTime(timeLeft)}`;
+    
+    // Change color when time is running low
+    if (timeLeft <= 30) {
+      document.getElementById("timer").style.color = "red";
+    }
+    
+    if (timeLeft <= 0) {
+      submitQuiz();
+    }
+  }, 1000);
+}
+
+// ================= START QUIZ =================
+function startQuiz() {
+  // Check if quiz data is loaded
+  if (quizData.length === 0) {
+    document.getElementById("quiz-container").innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <h2>Error</h2>
+        <p>No quiz questions found. Please check the page URL.</p>
+        <button onclick="location.reload()">Reload Page</button>
+      </div>
+    `;
+    return;
+  }
+  
+  showQuestion();
+  document.getElementById("next-btn").onclick = nextQuestion;
+  document.getElementById("back-btn").onclick = prevQuestion;
+  document.getElementById("submit-btn").onclick = submitQuiz;
+  startTimer();
+}10012"
   },
   {
     question: "Convert 25 to base 2.",
@@ -327,7 +580,6 @@ const mathQuestions = [
   options: ["N500","N600",  "N400", "N750"],
   correctAnswer: "N600"
 },
-// ... all other math questions here ...
 ];
 
 // PHYSICS QUESTIONS
@@ -651,737 +903,4 @@ const physicsQuestions = [
   {
     question: "Which law explains the direction of induced emf that opposes the change producing it?",
     options: ["Lenz's law", "Ohm's law", "Newton's law", "Hooke's law"],
-    correctAnswer: "Lenz's law"
-  },
-
-  // Chapter 13: Optics (5)
-  {
-    question: "According to the law of reflection, the angle of incidence equals the:",
-    options: ["Angle of reflection", "Angle of refraction", "Normal", "Critical angle"],
-    correctAnswer: "Angle of reflection"
-  },
-  {
-    question: "An image formed by a plane mirror is generally:",
-    options: ["Virtual, upright and same size as the object", "Real and inverted", "Virtual and magnified", "Real and diminished"],
-    correctAnswer: "Virtual, upright and same size as the object"
-  },
-  {
-    question: "Light travels slower in glass than in air, so glass has refractive index:",
-    options: ["Greater than 1", "Equal to 0", "Less than 1", "Negative"],
-    correctAnswer: "Greater than 1"
-  },
-  {
-    question: "Total internal reflection occurs when light goes from a denser to a rarer medium and the angle is:",
-    options: ["Greater than the critical angle", "Less than the critical angle", "At right angle only", "Equal to zero"],
-    correctAnswer: "Greater than the critical angle"
-  },
-  {
-    question: "The unit of optical power of a lens is called the:",
-    options: ["Dioptre", "Meter", "Ohm", "Tesla"],
-    correctAnswer: "Dioptre"
-  },
-
-  // Chapter 14: Modern Physics (Photoelectric & Particles) (5)
-  {
-    question: "In the photoelectric effect, increasing the intensity of light (at same frequency) mainly increases the:",
-    options: ["Photoelectric current", "Kinetic energy of emitted electrons", "Frequency of light", "Work function of metal"],
-    correctAnswer: "Photoelectric current"
-  },
-  {
-    question: "If the frequency of incident light is below the threshold frequency, photoelectrons will be:",
-    options: ["Not emitted", "Emitted with low energy", "Emitted with high energy", "Emitted with increasing current"],
-    correctAnswer: "Not emitted"
-  },
-  {
-    question: "What is the magnitude of the elementary electric charge (approx.)?",
-    options: ["1.6×10⁻¹⁹ C", "9.1×10⁻³¹ C", "1.0×10⁻¹⁹ C", "1.6×10⁻¹⁸ C"],
-    correctAnswer: "1.6×10⁻¹⁹ C"
-  },
-  {
-    question: "Which of these is the mass of electron (approx.)?",
-    options: ["9.11×10⁻³¹ kg", "1.67×10⁻²⁷ kg", "1.00×10⁻²⁶ kg", "9.11×10⁻²⁸ kg"],
-    correctAnswer: "9.11×10⁻³¹ kg"
-  },
-  {
-    question: "An alpha particle consists of:",
-    options: ["Two protons and two neutrons", "One electron", "One proton", "One neutron"],
-    correctAnswer: "Two protons and two neutrons"
-  },
-
-  // Chapter 15: Nuclear Physics & Radioactivity (5)
-  {
-    question: "A sample decays from 80 g to 10 g in some time. How many half-lives have passed?",
-    options: ["3", "2", "4", "1"],
-    correctAnswer: "3"
-  },
-  {
-    question: "What is the SI unit of radioactivity (decays per second)?",
-    options: ["Becquerel", "Curie", "Gray", "Sievert"],
-    correctAnswer: "Becquerel"
-  },
-  {
-    question: "If a substance has half-life 2 days and initial mass 100 g, how much remains after 6 days?",
-    options: ["12.5 g", "25 g", "6.25 g", "50 g"],
-    correctAnswer: "12.5 g"
-  },
-  {
-    question: "Which type of radiation is least penetrating and stopped by paper?",
-    options: ["Alpha", "Beta", "Gamma", "Neutron"],
-    correctAnswer: "Alpha"
-  },
-  {
-    question: "A beta particle is identical to which particle?",
-    options: ["Electron", "Proton", "Neutron", "Alpha particle"],
-    correctAnswer: "Electron"
-  }
-];// ... paste more physics questions here ...
-
-
-// CHEMISTRY QUESTIONS
-const chemistryQuestions = [
-  { question: "What is the chemical symbol for water?", options: ["O2", "CO2", "H2O", "NaCl"], correctAnswer: "H2O" },
-  { question: "Which gas turns limewater milky?", options: ["CO2", "O2", "N2", "H2"], correctAnswer: "CO2" },
-    {
-    question: "1. Which of the following statements about matter is correct?",
-    options: [
-      "Matter has mass and occupies space",
-      "Matter is always visible to the naked eye",
-      "Matter can only be solid",
-      "Matter cannot change state"
-    ],
-    correctAnswer: "Matter has mass and occupies space"
-  },
-  {
-    question: "2. Which of the following is NOT a physical property of matter?",
-    options: [
-      "Boiling point",
-      "Density",
-      "Reactivity with acids",
-      "Melting point"
-    ],
-    correctAnswer: "Reactivity with acids"
-  },
-  {
-    question: "3. The smallest particle of an element that can take part in a chemical reaction is called:",
-    options: ["Atom", "Molecule", "Ion", "Compound"],
-    correctAnswer: "Atom"
-  },
-  {
-    question: "4. Which of these is a mixture?",
-    options: ["Air", "Sodium chloride", "Water", "Sulphur"],
-    correctAnswer: "Air"
-  },
-  {
-    question: "5. Which of the following changes is a chemical change?",
-    options: [
-      "Melting of ice",
-      "Dissolution of sugar in water",
-      "Burning of wood",
-      "Boiling of water"
-    ],
-    correctAnswer: "Burning of wood"
-  },
-
-  // CHAPTER 2
-  {
-    question: "6. Which method is most suitable for separating a mixture of sand and common salt?",
-    options: [
-      "Filtration and evaporation",
-      "Distillation",
-      "Chromatography",
-      "Decantation"
-    ],
-    correctAnswer: "Filtration and evaporation"
-  },
-  {
-    question: "7. Which separation technique is used for separating petrol from kerosene?",
-    options: [
-      "Fractional distillation",
-      "Simple distillation",
-      "Filtration",
-      "Decantation"
-    ],
-    correctAnswer: "Fractional distillation"
-  },
-  {
-    question: "8. Which method is used in the production of pure water from seawater?",
-    options: [
-      "Distillation",
-      "Filtration",
-      "Decantation",
-      "Evaporation"
-    ],
-    correctAnswer: "Distillation"
-  },
-  {
-    question: "9. What process is used to separate coloured components in food dyes?",
-    options: [
-      "Chromatography",
-      "Sublimation",
-      "Evaporation",
-      "Filtration"
-    ],
-    correctAnswer: "Chromatography"
-  },
-  {
-    question: "10. Which of the following is NOT a separation method?",
-    options: [
-      "Filtration",
-      "Evaporation",
-      "Sublimation",
-      "Combustion"
-    ],
-    correctAnswer: "Combustion"
-  },
-
-  // CHAPTER 3
-  {
-    question: "11. Which of the following is an example of an element?",
-    options: ["Iron", "Water", "Salt", "Sugar"],
-    correctAnswer: "Iron"
-  },
-  {
-    question: "12. Which of the following is a compound?",
-    options: ["Sodium chloride", "Sulphur", "Oxygen", "Gold"],
-    correctAnswer: "Sodium chloride"
-  },
-  {
-    question: "13. Which of these is a mixture?",
-    options: ["Air", "Iron", "Water", "Carbon dioxide"],
-    correctAnswer: "Air"
-  },
-  {
-    question: "14. Which of the following is NOT an element?",
-    options: ["Oxygen", "Carbon", "Water", "Nitrogen"],
-    correctAnswer: "Water"
-  },
-  {
-    question: "15. Which of the following is a homogeneous mixture?",
-    options: ["Salt solution", "Sand and iron filings", "Oil and water", "Sulphur and charcoal"],
-    correctAnswer: "Salt solution"
-  },
-  {
-  question: "16. Which particle is found in the nucleus of an atom and has no charge?",
-  options: ["Neutron", "Proton", "Electron", "Positron"],
-  correctAnswer: "Neutron"
-},
-{
-  question: "17. The number of protons in an atom is called its:",
-  options: ["Mass number", "Atomic number", "Isotope number", "Neutron number"],
-  correctAnswer: "Atomic number"
-},
-{
-  question: "18. Isotopes are atoms of the same element having the same number of protons but different number of:",
-  options: ["Neutrons", "Protons", "Electrons", "Nuclei"],
-  correctAnswer: "Neutrons"
-},
-{
-  question: "19. Which subatomic particle determines the chemical properties of an element?",
-  options: ["Electron", "Neutron", "Proton", "Nucleon"],
-  correctAnswer: "Electron"
-},
-{
-  question: "20. The total number of protons and neutrons in an atom is known as:",
-  options: ["Mass number", "Atomic number", "Charge number", "Proton number"],
-  correctAnswer: "Mass number"
-},
-
-// CHAPTER 5
-{
-  question: "21. Which scientist proposed the plum pudding model of the atom?",
-  options: ["J.J. Thomson", "Ernest Rutherford", "John Dalton", "Niels Bohr"],
-  correctAnswer: "J.J. Thomson"
-},
-{
-  question: "22. Rutherford's alpha particle scattering experiment led to the discovery of:",
-  options: ["Nucleus", "Electron", "Neutron", "Proton"],
-  correctAnswer: "Nucleus"
-},
-{
-  question: "23. Which atomic model suggests that electrons move in fixed orbits around the nucleus?",
-  options: ["Bohr's model", "Rutherford's model", "Thomson's model", "Quantum mechanical model"],
-  correctAnswer: "Bohr's model"
-},
-{
-  question: "24. Who discovered the neutron?",
-  options: ["James Chadwick", "J.J. Thomson", "Ernest Rutherford", "Niels Bohr"],
-  correctAnswer: "James Chadwick"
-},
-{
-  question: "25. Which model of the atom is the most widely accepted today?",
-  options: ["Quantum mechanical model", "Bohr's model", "Rutherford's model", "Plum pudding model"],
-  correctAnswer: "Quantum mechanical model"
-},
-
-// CHAPTER 6
-{
-  question: "26. Which of the following is a chemical compound?",
-  options: ["Sodium chloride", "Oxygen", "Sulphur", "Iron"],
-  correctAnswer: "Sodium chloride"
-},
-{
-  question: "27. Which of the following is an element?",
-  options: ["Hydrogen", "Water", "Carbon dioxide", "Ammonia"],
-  correctAnswer: "Hydrogen"
-},
-{
-  question: "28. Which of these is a mixture?",
-  options: ["Air", "Oxygen", "Sodium chloride", "Carbon dioxide"],
-  correctAnswer: "Air"
-},
-{
-  question: "29. Which of the following is NOT a compound?",
-  options: ["Water", "Carbon monoxide", "Sulphur", "Sodium hydroxide"],
-  correctAnswer: "Sulphur"
-},
-{
-  question: "30. Which type of mixture can be separated by filtration?",
-  options: ["Suspension", "Solution", "Colloid", "Emulsion"],
-  correctAnswer: "Suspension"
-},
-{
-  question: "31. The smallest particle of an element that can take part in a chemical reaction is called:",
-  options: ["Atom", "Molecule", "Ion", "Proton"],
-  correctAnswer: "Atom"
-},
-{
-  question: "32. The combination of two or more atoms held together by chemical bonds is known as:",
-  options: ["Molecule", "Compound", "Element", "Mixture"],
-  correctAnswer: "Molecule"
-},
-{
-  question: "33. Which of these is a diatomic molecule?",
-  options: ["Oxygen", "Sulphur", "Phosphorus", "Carbon"],
-  correctAnswer: "Oxygen"
-},
-{
-  question: "34. Which of the following represents a triatomic molecule?",
-  options: ["O₃", "H₂", "Cl₂", "N₂"],
-  correctAnswer: "O₃"
-},
-{
-  question: "35. Which type of molecule consists of different atoms?",
-  options: ["Compound molecule", "Element molecule", "Isotope molecule", "Homogeneous molecule"],
-  correctAnswer: "Compound molecule"
-},
-
-// CHAPTER 8
-{
-  question: "36. The number of atoms in 12 g of carbon-12 is known as:",
-  options: ["Avogadro's number", "Molar mass", "Atomic number", "Mass number"],
-  correctAnswer: "Avogadro's number"
-},
-{
-  question: "37. The molar volume of a gas at STP is:",
-  options: ["22.4 dm³", "1 dm³", "12 dm³", "24 dm³"],
-  correctAnswer: "22.4 dm³"
-},
-{
-  question: "38. One mole of oxygen gas contains how many molecules?",
-  options: ["6.02 × 10²³", "3.01 × 10²³", "1.00 × 10²³", "12.04 × 10²³"],
-  correctAnswer: "6.02 × 10²³"
-},
-{
-  question: "39. Which law states that equal volumes of gases at the same temperature and pressure contain equal number of molecules?",
-  options: ["Avogadro's law", "Boyle's law", "Charles's law", "Dalton's law"],
-  correctAnswer: "Avogadro's law"
-},
-{
-  question: "40. Calculate the number of moles in 44 g of CO₂. (C = 12, O = 16)",
-  options: ["1 mole", "2 moles", "3 moles", "0.5 mole"],
-  correctAnswer: "1 mole"
-},
-
-// CHAPTER 9
-{
-  question: "41. Which type of bond involves the sharing of electron pairs between atoms?",
-  options: ["Covalent bond", "Ionic bond", "Metallic bond", "Hydrogen bond"],
-  correctAnswer: "Covalent bond"
-},
-{
-  question: "42. Which type of bond is formed when electrons are transferred from one atom to another?",
-  options: ["Ionic bond", "Covalent bond", "Metallic bond", "Hydrogen bond"],
-  correctAnswer: "Ionic bond"
-},
-{
-  question: "43. Which of these compounds contains ionic bonds?",
-  options: ["NaCl", "H₂O", "CH₄", "O₂"],
-  correctAnswer: "NaCl"
-},
-{
-  question: "44. Which type of bond is responsible for the conductivity of metals?",
-  options: ["Metallic bond", "Covalent bond", "Ionic bond", "Hydrogen bond"],
-  correctAnswer: "Metallic bond"
-},
-{
-  question: "45. A covalent bond in which the shared electron pair is provided by only one of the atoms is called:",
-  options: ["Dative bond", "Ionic bond", "Single bond", "Double bond"],
-  correctAnswer: "Dative bond"
-},
-{
-  question: "46. The oxidation number of oxygen in most compounds is:",
-  options: ["-2", "-1", "+1", "+2"],
-  correctAnswer: "-2"
-},
-{
-  question: "47. Which element has an oxidation number of 0 in its natural state?",
-  options: ["Oxygen", "Sodium", "Chlorine", "Iron"],
-  correctAnswer: "Oxygen"
-},
-{
-  question: "48. In Na₂SO₄, the oxidation number of sulphur is:",
-  options: ["+6", "+4", "+2", "-2"],
-  correctAnswer: "+6"
-},
-{
-  question: "49. Which type of reaction involves both oxidation and reduction?",
-  options: ["Redox reaction", "Neutralization", "Precipitation", "Combustion"],
-  correctAnswer: "Redox reaction"
-},
-{
-  question: "50. The oxidation number of hydrogen in water is:",
-  options: ["+1", "0", "-1", "+2"],
-  correctAnswer: "+1"
-},
-
-// CHAPTER 11
-{
-  question: "51. Which of these is an example of an exothermic reaction?",
-  options: ["Combustion", "Photosynthesis", "Electrolysis", "Thermal decomposition"],
-  correctAnswer: "Combustion"
-},
-{
-  question: "52. A reaction that absorbs heat from its surroundings is called:",
-  options: ["Endothermic reaction", "Exothermic reaction", "Isothermal reaction", "Catalytic reaction"],
-  correctAnswer: "Endothermic reaction"
-},
-{
-  question: "53. Which of these reactions is endothermic?",
-  options: ["Photosynthesis", "Combustion of fuel", "Neutralization", "Condensation"],
-  correctAnswer: "Photosynthesis"
-},
-{
-  question: "54. Which instrument is used to measure the heat change in a reaction?",
-  options: ["Calorimeter", "Thermometer", "Manometer", "Barometer"],
-  correctAnswer: "Calorimeter"
-},
-{
-  question: "55. The burning of methane is:",
-  options: ["Exothermic", "Endothermic", "Isothermal", "Reversible"],
-  correctAnswer: "Exothermic"
-},
-
-// CHAPTER 12
-{
-  question: "56. Which factor does not affect the rate of a chemical reaction?",
-  options: ["Color of reactants", "Concentration of reactants", "Temperature", "Presence of catalyst"],
-  correctAnswer: "Color of reactants"
-},
-{
-  question: "57. Increasing the temperature generally:",
-  options: ["Increases the rate of reaction", "Decreases the rate of reaction", "Stops the reaction", "Has no effect"],
-  correctAnswer: "Increases the rate of reaction"
-},
-{
-  question: "58. A substance that increases the rate of a chemical reaction without being consumed is called:",
-  options: ["Catalyst", "Reactant", "Product", "Enzyme"],
-  correctAnswer: "Catalyst"
-},
-{
-  question: "59. Which of these factors increases the rate of reaction by increasing surface area?",
-  options: ["Powdering solid reactants", "Cooling reactants", "Diluting reactants", "Removing catalyst"],
-  correctAnswer: "Powdering solid reactants"
-},
-{
-  question: "60. The collision theory explains:",
-  options: ["How particles must collide to react", "The color of substances", "The weight of reactants", "The movement of solids"],
-  correctAnswer: "How particles must collide to react"
-},
-// CHAPTER 13
-{
-  question: "61. Organic compounds containing only carbon and hydrogen are called:",
-  options: ["Hydrocarbons", "Alcohols", "Carboxylic acids", "Esters"],
-  correctAnswer: "Hydrocarbons"
-},
-{
-  question: "62. Which of the following is an alkane?",
-  options: ["Methane", "Ethene", "Ethyne", "Benzene"],
-  correctAnswer: "Methane"
-},
-{
-  question: "63. The general formula of alkanes is:",
-  options: ["CnH2n+2", "CnH2n", "CnH2n-2", "CnHn"],
-  correctAnswer: "CnH2n+2"
-},
-{
-  question: "64. Which of these is an unsaturated hydrocarbon?",
-  options: ["Ethene", "Methane", "Propane", "Butane"],
-  correctAnswer: "Ethene"
-},
-{
-  question: "65. Which functional group is present in alcohols?",
-  options: ["–OH", "–COOH", "–CHO", "–NH2"],
-  correctAnswer: "–OH"
-},
-
-// CHAPTER 14
-{
-  question: "66. Which of these is a strong acid?",
-  options: ["HCl", "CH3COOH", "H2CO3", "H2S"],
-  correctAnswer: "HCl"
-},
-{
-  question: "67. The pH of a neutral solution is:",
-  options: ["7", "0", "14", "1"],
-  correctAnswer: "7"
-},
-{
-  question: "68. A base that dissolves in water is called:",
-  options: ["Alkali", "Salt", "Acid", "Oxide"],
-  correctAnswer: "Alkali"
-},
-{
-  question: "69. Which of these is a weak acid?",
-  options: ["CH3COOH", "HNO3", "H2SO4", "HCl"],
-  correctAnswer: "CH3COOH"
-},
-{
-  question: "70. The reaction between an acid and a base produces:",
-  options: ["Salt and water", "Salt only", "Water only", "Gas and water"],
-  correctAnswer: "Salt and water"
-},
-
-// CHAPTER 15
-{
-  question: "71. Which of the following is a renewable source of energy?",
-  options: ["Solar energy", "Coal", "Petroleum", "Natural gas"],
-  correctAnswer: "Solar energy"
-},
-{
-  question: "72. Which fuel produces the least pollution?",
-  options: ["Natural gas", "Coal", "Diesel", "Petrol"],
-  correctAnswer: "Natural gas"
-},
-{
-  question: "73. The main constituent of natural gas is:",
-  options: ["Methane", "Ethane", "Propane", "Butane"],
-  correctAnswer: "Methane"
-},
-{
-  question: "74. Which of these is not a fossil fuel?",
-  options: ["Wood", "Coal", "Petroleum", "Natural gas"],
-  correctAnswer: "Wood"
-},
-{
-  question: "75. The energy stored in food is a form of:",
-  options: ["Chemical energy", "Heat energy", "Light energy", "Nuclear energy"],
-  correctAnswer: "Chemical energy"
-},
-  // ... paste more chemistry questions here ...
-];
-
-// ENGLISH QUESTIONS
-const englishQuestions = [
-  { question: "Choose the correct spelling.", options: ["Acommodate", "Accommodate", "Acomodate", "Accomodate"], correctAnswer: "Accommodate" },
-  { question: "What is the synonym of 'happy'?", options: ["Sad", "Joyful", "Angry", "Tired"], correctAnswer: "Joyful" },
-  {
-    question: "1. Choose the word that is closest in meaning to the underlined word: The teacher was *elated* by the students' performance.",
-    options: ["Angry", "Joyful", "Worried", "Confused"],
-    correctAnswer: "Joyful"
-  },
-  {
-    question: "2. Choose the opposite of the underlined word: The meeting was *mandatory* for all staff.",
-    options: ["Optional", "Compulsory", "Necessary", "Obligatory"],
-    correctAnswer: "Optional"
-  },
-  {
-    question: "3. The word most similar in meaning to *meticulous* is:",
-    options: ["Careful", "Careless", "Quick", "Lazy"],
-    correctAnswer: "Careful"
-  },
-  {
-    question: "4. Choose the opposite of: The plan was *feasible*.",
-    options: ["Possible", "Achievable", "Impossible", "Likely"],
-    correctAnswer: "Impossible"
-  },
-  {
-    question: "5. The synonym of *benevolent* is:",
-    options: ["Kind", "Selfish", "Cruel", "Hostile"],
-    correctAnswer: "Kind"
-  },
-  {
-    question: "6. Choose the word that means the same as *succinct*.",
-    options: ["Brief", "Lengthy", "Verbose", "Detailed"],
-    correctAnswer: "Brief"
-  },
-  {
-    question: "7. The antonym of *abundant* is:",
-    options: ["Plentiful", "Scarce", "Numerous", "Overflowing"],
-    correctAnswer: "Scarce"
-  },
-  {
-    question: "8. The word *hostile* is closest in meaning to:",
-    options: ["Friendly", "Aggressive", "Calm", "Peaceful"],
-    correctAnswer: "Aggressive"
-  },
-  {
-    question: "9. Choose the opposite of: She gave a *genuine* smile.",
-    options: ["Sincere", "Real", "Fake", "Honest"],
-    correctAnswer: "Fake"
-  },
-  {
-    question: "10. The synonym of *obsolete* is:",
-    options: ["Modern", "Outdated", "New", "Recent"],
-    correctAnswer: "Outdated"
-  },
-    {
-    question: "11. She decided to *face the music* after being caught cheating.",
-    options: ["Listen to music", "Accept the consequences", "Sing a song", "Dance"],
-    correctAnswer: "Accept the consequences"
-  },
-  {
-    question: "12. He is always *fishing for compliments*.",
-    options: ["Trying to catch fish", "Asking for help", "Seeking praise", "Looking for friends"],
-    correctAnswer: "Seeking praise"
-  },
-  {
-    question: "13. After losing his job, he had to *tighten his belt*.",
-    options: ["Wear a smaller belt", "Spend less money", "Eat more food", "Work harder"],
-    correctAnswer: "Spend less money"
-  },
-  {
-    question: "14. The new policy will *weed out* lazy workers.",
-    options: ["Promote", "Remove", "Reward", "Employ"],
-    correctAnswer: "Remove"
-  },
-  {
-    question: "15. She really *let the cat out of the bag* about the surprise party.",
-    options: ["Brought her cat outside", "Revealed the secret", "Bought a pet", "Started a fight"],
-    correctAnswer: "Revealed the secret"
-  },
-  {
-    question: "16. The manager's decision *sparked off* a heated debate.",
-    options: ["Stopped", "Started", "Avoided", "Cooled"],
-    correctAnswer: "Started"
-  },
-  {
-    question: "17. He always *beats around the bush* instead of answering directly.",
-    options: ["Talks indirectly", "Cuts trees", "Runs in circles", "Avoids people"],
-    correctAnswer: "Talks indirectly"
-  },
-  {
-    question: "18. The politician was *in hot water* after the scandal.",
-    options: ["In trouble", "In a bath", "On holiday", "Cooking"],
-    correctAnswer: "In trouble"
-  },
-  {
-    question: "19. She *passed away* peacefully last night.",
-    options: ["Died", "Left the room", "Traveled", "Fainted"],
-    correctAnswer: "Died"
-  },
-  {
-    question: "20. His promotion was *up in the air* after the new management took over.",
-    options: ["Certain", "Uncertain", "Decided", "Obvious"],
-    correctAnswer: "Uncertain"
-  },
-  // ... paste more english questions here ...
-];
-
-// ================= DETECT SUBJECT PAGE =================
-let quizData = [];
-const path = window.location.pathname.toLowerCase();
-
-if (path.includes("math.html")) quizData = mathQuestions;
-else if (path.includes("physics.html")) quizData = physicsQuestions;
-else if (path.includes("chemistry.html")) quizData = chemistryQuestions;
-else if (path.includes("english.html")) quizData = englishQuestions;
-
-// ================= QUIZ VARIABLES =================
-let currentQuestion = 0;
-let score = 0;
-let selectedAnswers = Array(quizData.length).fill(null);
-let timer;
-let timeLeft = 120; // 2 minutes
-
-// ================= SHOW QUESTION =================
-function showQuestion() {
-  const q = quizData[currentQuestion];
-  document.getElementById("question").innerText = `${currentQuestion + 1}. ${q.question}`;
-
-  const optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
-
-  q.options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.innerText = option;
-    btn.onclick = () => {
-      selectedAnswers[currentQuestion] = option;
-      highlightSelection(option);
-    };
-    if (selectedAnswers[currentQuestion] === option) {
-      btn.style.backgroundColor = "#bbb";
-    }
-    optionsDiv.appendChild(btn);
-  });
-
-  document.getElementById("back-btn").style.display = currentQuestion > 0 ? "inline-block" : "none";
-  document.getElementById("next-btn").style.display = currentQuestion < quizData.length - 1 ? "inline-block" : "none";
-}
-
-// ================= HIGHLIGHT =================
-function highlightSelection(selected) {
-  document.querySelectorAll("#options button").forEach(btn => {
-    btn.style.backgroundColor = btn.innerText === selected ? "#bbb" : "";
-  });
-}
-
-// ================= NAVIGATION =================
-function nextQuestion() {
-  if (currentQuestion < quizData.length - 1) {
-    currentQuestion++;
-    showQuestion();
-  }
-}
-
-function prevQuestion() {
-  if (currentQuestion > 0) {
-    currentQuestion--;
-    showQuestion();
-  }
-}
-
-// ================= SUBMIT QUIZ =================
-function submitQuiz() {
-  clearInterval(timer);
-  score = 0;
-  quizData.forEach((q, i) => {
-    if (selectedAnswers[i] === q.correctAnswer) {
-      score++;
-    }
-  });
-  document.getElementById("quiz-container").innerHTML = `
-    <h2>Quiz Finished!</h2>
-    <p>Your score: ${score}/${quizData.length}</p>
-    <button onclick="location.reload()">Restart Quiz</button>
-  `;
-}
-
-// ================= TIMER =================
-function startTimer() {
-  timer = setInterval(() => {
-    timeLeft--;
-    document.getElementById("timer").innerText = `Time left: ${timeLeft}s`;
-    if (timeLeft <= 0) {
-      submitQuiz();
-    }
-  }, 1000);
-}
-
-// ================= START QUIZ =================
-function startQuiz() {
-  showQuestion();
-  document.getElementById("next-btn").onclick = nextQuestion;
-  document.getElementById("back-btn").onclick = prevQuestion;
-  document.getElementById("submit-btn").onclick = submitQuiz;
-  startTimer();
-}
+    correctAnswer: "
