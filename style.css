@@ -1,0 +1,44 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  padding: 20px;
+  margin: 0;
+}
+
+#home-container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.welcome-msg {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.subjects button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.subjects button:hover {
+  background-color: #45a049;
+}
